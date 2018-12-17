@@ -1,4 +1,6 @@
 ﻿$urifile = "https://raw.githubusercontent.com/daniilkorytko/Interesting/master/Test1.txt"
+#$urifile = "https://raw.githubusercontent.com/daniilkorytko/Interesting/master/Test2.txt"
+
 
 $testText = ((Invoke-WebRequest -Uri $urifile).content).split("`n")
 
