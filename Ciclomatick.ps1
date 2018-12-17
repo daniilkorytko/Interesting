@@ -1,13 +1,13 @@
-﻿
+﻿$urifile = "https://raw.githubusercontent.com/daniilkorytko/Interesting/master/Test1.txt"
 
-$testText = Get-Content -Path C:\Work\PS\Cuclomatick\Test2.txt
+$testText = ((Invoke-WebRequest -Uri $urifile).content).split("`n")
 
 $cilcDifficult=1
 $mediumCiclomatickDiff=1
 $maxCiclomatickDiff = 1
 
 
-$charText = $testText.ToCharArray()
+
 $otkrivskobka=0
 $zakrivskobka=0
 $ciclCount = 0
@@ -21,7 +21,7 @@ for($nomerstroki=0; $nomerstroki -lt $testText.Count; $nomerstroki++){
     #разделение на параграфы
 
     if($testText[$nomerstroki] -match "\*"){continue;}
-    $charText = $testText[$nomerstroki].ToCharArray()
+    $charText = $testText[$nomerstroki].tochararray()
 
     for($nomerElementa=0; $nomerElementa -lt $charText.Count; $nomerElementa++)
     {
