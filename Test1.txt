@@ -272,7 +272,7 @@ export default class GraphVertex {
    * @param {function} [callback]
    * @returns {string}
    */
-  toString(callback) {
-    return callback ? callback(this.value) : `${this.value}`;
+  toString(callback) { //dksjfhdsklgjhsdgfkljdgf
+    return callback ? callback(this.value) : `${this.value}`; // dklsghsdlgkjhsgljhslh
   }
 }
