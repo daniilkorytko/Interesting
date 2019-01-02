@@ -3,7 +3,7 @@
 
 
 Param(
-    [string]$inputUriFile = "https://raw.githubusercontent.com/daniilkorytko/Interesting/master/Test1.txt"
+    [string]$InputUriFile = "https://raw.githubusercontent.com/daniilkorytko/Interesting/master/Test1.txt"
 )
 
 
@@ -14,7 +14,7 @@ $maxCyclomaticDifficult = 0
 $mediumCyclomaticDifficult = 0
 $arrayOfParagraphs = @()
 
-$inputText = ((Invoke-WebRequest -Uri $inputUriFile).content).split("`n")
+$inputText = ((Invoke-WebRequest -Uri $InputUriFile).content).split("`n")
 
 #delete comments
 for($line=0; $line -lt $inputText.Count; $line++){
