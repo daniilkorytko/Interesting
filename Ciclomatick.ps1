@@ -1,87 +1,107 @@
-﻿$urifile = "https://raw.githubusercontent.com/daniilkorytko/Interesting/master/Test1.txt"
-#$urifile = "https://raw.githubusercontent.com/daniilkorytko/Interesting/master/Test2.txt"
-
-
-$testText = ((Invoke-WebRequest -Uri $urifile).content).split("`n")
-
-$cilcDifficult=1
-$mediumCiclomatickDiff=1
-$maxCiclomatickDiff = 1
+﻿## Script for calculatng cyclomatic difficulties
 
 
 
-$otkrivskobka=0
-$zakrivskobka=0
-$ciclCount = 0
-
-$defaultCiclCount = 0
-
-$massiveNezavicFunction = @()
+Param(
+    [string]$inputUriFile = "https://raw.githubusercontent.com/daniilkorytko/Interesting/master/Test1.txt"
+)
 
 
-for($nomerstroki=0; $nomerstroki -lt $testText.Count; $nomerstroki++){
-    #разделение на параграфы
+$comment =$false
 
-    if($testText[$nomerstroki] -match "\*"){continue;}
-    $charText = $testText[$nomerstroki].tochararray()
+$cycleCount = 0
+$maxCyclomaticDifficult = 0
+$mediumCyclomaticDifficult = 0
+$arrayOfParagraphs = @()
 
-    for($nomerElementa=0; $nomerElementa -lt $charText.Count; $nomerElementa++)
-    {
+$inputText = ((Invoke-WebRequest -Uri $inputUriFile).content).split("`n")
 
-        if($charText[$nomerElementa] -eq "`{"){$otkrivskobka++;$ciclCount++}
-        if($charText[$nomerElementa] -eq "`}"){$zakrivskobka++;$ciclCount--}
-
-        if((($ciclCount - $DefaultCiclCount) -eq 2) -and ($ciclCount -eq 2)){
-            $beginParagrapf = $nomerstroki
-
-            $defaultCiclCount=2
-
-        }
-        if((($ciclCount - $DefaultCiclCount) -eq -1) -and ($ciclCount -eq 1)){
-
-            $Paragrapf = [ordered]@{
-            Begin = $beginParagrapf
-            End = $nomerstroki
-            CiclomatickDiff = $cilcDifficult
+#delete comments
+for($line=0; $line -lt $inputText.Count; $line++){
+   
+    if($comment -eq $true){
+        if($inputText[$line] -match "\*\/.*"){
+            $comment = $false
             }
-
-            $defaultCiclCount=0
-            $massiveNezavicFunction += $Paragrapf
-
-        }
-
+        $inputText[$line] = ""
     }
+    else{
+        if($inputText[$line] -match "\/\*.*"){
 
+            if($inputText[$line] -notmatch "\*\/.*"){
+                 $comment = $true
+            }
+            $inputText[$line] = ""
+        }
+        if($inputText[$line] -match ".*(//.*)"){
+            $inputText[$line] = $inputText[$line].Replace($Matches[1],"")
+        }
+    }
 }
 
-for($nomerParagrapha = 0;$nomerParagrapha -lt $massiveNezavicFunction.Count ;$nomerParagrapha++){
-    
-    $beginParagraph = $massiveNezavicFunction[$nomerParagrapha].begin
-    $endParagraph = $massiveNezavicFunction[$nomerParagrapha].end
 
-    ##подсчет цикломатической сложности для каждого параграфа
-    for($nomerstroki=$beginParagraph; $nomerstroki -lt $endParagraph; $nomerstroki++)
+
+ #separation for paragraphs
+for($line=0; $line -lt $inputText.Count; $line++){
+   
+    $charText = $inputText[$line].tochararray()
+
+    for($element=0; $element -lt $charText.Count; $element++)
+    {
+        if($charText[$element] -eq "`{"){
+            $cycleCount++
+
+            if($cycleCount -eq 2){
+                $beginParagrapf = $line
+
+            }
+        }
+        if($charText[$element] -eq "`}"){
+            $cycleCount--
+            if($cycleCount -eq 1){
+
+                $paragraph = [ordered]@{
+                    begin = $beginParagrapf
+                    end = $line
+                    cyclomaticDifficult = 1
+                }
+
+            $arrayOfParagraphs += $paragraph
+            }
+        }
+    }
+}
+
+
+#calculate the Cyclomatic Difficulties
+for($paragraph = 0;$paragraph -lt $arrayOfParagraphs.Count ;$paragraph++){
+    
+    $beginParagraph = $arrayOfParagraphs[$paragraph].begin
+    $endParagraph = $arrayOfParagraphs[$paragraph].end
+
+    #calculate the Cyclomatic Difficulties for each paragraphs
+    for($line=$beginParagraph; $line -lt $endParagraph; $line++)
     {
 
-        if($testText[$nomerstroki] -match "while "){$massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff++}
-        if($testText[$nomerstroki] -match "for "){$massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff++}
-        if($testText[$nomerstroki] -match "if "){$massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff++}
-        if($testText[$nomerstroki] -match "case: "){$massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff++}
-        if($testText[$nomerstroki] -match "default: "){$massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff++}
-        if($testText[$nomerstroki] -match "\?"){$massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff++}
+        if($inputText[$line] -match "while "){$arrayOfParagraphs[$paragraph].cyclomaticDifficult++}
+        if($inputText[$line] -match "for "){$arrayOfParagraphs[$paragraph].cyclomaticDifficult++}
+        if($inputText[$line] -match "if "){$arrayOfParagraphs[$paragraph].cyclomaticDifficult++}
+        if($inputText[$line] -match "case: "){$arrayOfParagraphs[$paragraph].cyclomaticDifficult++}
+        if($inputText[$line] -match "default: "){$arrayOfParagraphs[$paragraph].cyclomaticDifficult++}
+        if($inputText[$line] -match "\?"){$arrayOfParagraphs[$paragraph].cyclomaticDifficult++}
     
     }
-    #определение максимальной цикломатической сложности
-    if($massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff -gt $maxCiclomatickDiff){
-        $maxCiclomatickDiff = $massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff
+    #calculate the maximum of Cyclomatic Difficulties 
+    if($arrayOfParagraphs[$paragraph].cyclomaticDifficult -gt $maxCyclomaticDifficult){
+        $maxCyclomaticDifficult = $arrayOfParagraphs[$paragraph].cyclomaticDifficult
 
     }
-    #определение средней цикломатической сложности
-    $mediumCiclomatickDiff += $massiveNezavicFunction[$nomerParagrapha].CiclomatickDiff
+    #calculate the average of Cyclomatic Difficulties 
+    $mediumCyclomaticDifficult += $arrayOfParagraphs[$paragraph].cyclomaticDifficult
 
 
 }
 
-$mediumCiclomatickDiff /= $massiveNezavicFunction.Count
+$mediumCyclomaticDifficult /= $arrayOfParagraphs.Count
 
-Write-Host "The most complex function has a cyclomatic complexity value of $maxCiclomatickDiff` while the median is $mediumCiclomatickDiff" 
+Write-Host "The most complex function has a cyclomatic complexity value of $maxCyclomaticDifficult` while the median is $mediumCyclomaticDifficult" 
