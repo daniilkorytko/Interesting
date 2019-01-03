@@ -1,0 +1,130 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "AzureApplicationName": {
+            "type": "string",
+            "defaultValue": "DaniilFunction2"
+        },
+        "StorageName": {
+            "type": "string",
+            "defaultValue": "[toLower(concat(parameters('AzureApplicationName'),'stac1'))]"
+        },
+        "AzureApplicationInsightsName": {
+            "type": "string",
+            "defaultValue": "[concat(parameters('AzureApplicationName'),'-ApplicationInsights')]"
+        },
+        "AzureFunction":{
+            "type": "string"
+        }
+    },
+    "variables": {
+        "functionName" : "httpRequest"
+       
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-05-01-preview",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('StorageName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "apiVersion": "2015-05-01",
+            "name": "[parameters('AzureApplicationInsightsName')]",
+            "type": "microsoft.insights/components",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ApplicationId": "[parameters('AzureApplicationName')]",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "Enabled" :true,
+                "Application_Type" :"web"
+                
+            },
+            "kind": "other"
+        },
+        {
+            "apiVersion": "2016-03-01",
+            "name": "[parameters('AzureApplicationName')]",
+            "type": "Microsoft.Web/sites",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageName'))]",
+                "[resourceId('microsoft.insights/components', parameters('AzureApplicationInsightsName'))]"
+            ],
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "properties": {
+                "name": "[parameters('AzureApplicationName')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "dotnet"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('StorageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageName')), '2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('StorageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageName')), '2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageName')), '2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[ parameters('storageName')]"
+                        },
+                        {
+                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                            "value": "8.11.1"
+                        },
+                        {
+                            "name": "AppInsights_InstrumentationKey",
+                            "value": "[reference(concat('microsoft.insights/components/', parameters('AzureApplicationInsightsName'))).InstrumentationKey]"
+                        }
+
+                    ]
+                },
+                
+                "clientAffinityEnabled": false,
+                "reserved": false
+                
+            }
+        },
+        {
+            "name": "[concat(parameters('AzureApplicationName'),'/', variables('functionName'))]",
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2016-03-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('AzureApplicationName'))]"
+            ],
+            "properties": {
+                "config": {
+                    "bindings": [
+                        {
+                            "type": "httpTrigger",
+                            "name": "req",
+                            "authLevel": "function",
+                            "direction": "in"
+                        }
+ 
+                    ],
+                    "disabled": false
+                },
+                "files": {
+                    "run.csx": "[parameters('AzureFunction')]"
+                }
+            }
+        }
+    ]
+}
