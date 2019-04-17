@@ -3,40 +3,31 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "string",
-            "value": "centralus"
+            "type": "string"
         },
         "networkInterfaceName": {
-            "type": "string",
-            "value": "ms-test32bit445"
+            "type": "string"
         },
         "subnetName": {
-            "type": "string",
-            "value": "MnD-QA-ES-data"
+            "type": "string"
         },
         "virtualNetworkId": {
-            "type": "string",
-            "value": "/subscriptions/c010acea-afe0-49b9-ae65-31e50040aa2e/resourceGroups/3E-NP/providers/Microsoft.Network/virtualNetworks/3E-NP"
+            "type": "string"
         },
         "virtualMachineName": {
-            "type": "string",
-            "value": "MS-test32bit"
+            "type": "string"
         },
         "virtualMachineSize": {
-            "type": "string",
-            "value": "Standard_A2_v2"
+            "type": "string"
         },
         "adminUsername": {
-            "type": "string",
-            "value": "Administrator1"
+            "type": "string"
         },
         "adminPassword": {
-            "type": "securestring",
-            "value": "Administrator1"
+            "type": "securestring"
         },
         "idosDisk": {
-            "type": "string",
-            "value": "https://msvhdvault.blob.core.windows.net/vhd32bit/MS32bit.vhd?sp=r&st=2019-04-17T11:21:56Z&se=2019-04-17T19:21:56Z&spr=https&sv=2018-03-28&sig=TzBRSpeMr1uhsOwkhZSSSZyAAhzhpetctwD%2BHEfVBkE%3D&sr=b"
+            "type": "string"
         }
     },
     "variables": {
