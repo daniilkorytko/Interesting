@@ -1,0 +1,115 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "value": "centralus"
+        },
+        "networkInterfaceName": {
+            "type": "string",
+            "value": "ms-test32bit445"
+        },
+        "subnetName": {
+            "type": "string",
+            "value": "MnD-QA-ES-data"
+        },
+        "virtualNetworkId": {
+            "type": "string",
+            "value": "/subscriptions/c010acea-afe0-49b9-ae65-31e50040aa2e/resourceGroups/3E-NP/providers/Microsoft.Network/virtualNetworks/3E-NP"
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "value": "MS-test32bit"
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "value": "Standard_A2_v2"
+        },
+        "adminUsername": {
+            "type": "string",
+            "value": "Administrator1"
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "value": "Administrator1"
+        },
+        "idosDisk": {
+            "type": "string",
+            "value": "https://msvhdvault.blob.core.windows.net/vhd32bit/MS32bit.vhd?sp=r&st=2019-04-17T11:21:56Z&se=2019-04-17T19:21:56Z&spr=https&sv=2018-03-28&sig=TzBRSpeMr1uhsOwkhZSSSZyAAhzhpetctwD%2BHEfVBkE%3D&sr=b"
+        }
+    },
+    "variables": {
+        "vnetId": "[parameters('virtualNetworkId')]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+    },
+    "resources": [
+        {
+            "name": "[parameters('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-06-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "name": "VmRestored_Osdisk",
+                        "caching": "ReadWrite",
+                        "osType": "Windows",
+                        "createOption": "Attach",
+                        "managedDisk": {
+                          "id": "[parameters('idosDisk')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}
