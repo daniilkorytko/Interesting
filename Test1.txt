@@ -1,137 +1,193 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <configSections>
-    <sectionGroup name="applicationSettings" type="System.Configuration.ApplicationSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <section name="MatterSphere.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
-    </sectionGroup>
+    <section name="documentService" type="ClientPortal.DataService.DocumentServiceSection, ClientPortal.DataService" />
+    <section name="prizm" type="Mattersphere.PrizmViewer.PrizmConfigurationSection, Mattersphere.PrizmViewer" />
+    <section name="userTempStorage" type="Portal.Interfaces.DiskStoragePathConfigurationSection, Portal.Interfaces" />
+    <section name="unity" type="Microsoft.Practices.Unity.Configuration.UnityConfigurationSection, Microsoft.Practices.Unity.Configuration" />
+    <section name="portal" type="Portal.Interfaces.Configuration.PortalConfigurationSection, Portal.Interfaces" />
+    <section name="portalServerCredentials" type="Portal.Interfaces.Configuration.PortalServerCredentialsConfigSection, Portal.Interfaces" />
+    <section name="portalPWResetTimeOut" type="Portal.Interfaces.Configuration.PortalPWResetTimeOutSection, Portal.Interfaces" />
+    <section name="glimpse" type="Glimpse.Core.Configuration.Section, Glimpse.Core" />
   </configSections>
-  <appSettings>
-    <add key="EliteFrameworkSessionType" value="MatterSphere.ServerSession, Elite.MatterSphere.Services" />
-  </appSettings>
-  <system.diagnostics>
-    <trace autoflush="true" />
-    <sources>
-      <source name="System.ServiceModel" switchValue="Information, ActivityTracing" propagateActivity="true">
-        <listeners>
-          <add name="xml" />
-        </listeners>
-      </source>
-      <source name="ServiceStartup" switchValue="Information, ActivityTracing, Verbose">
-        <listeners>
-          <add name="xml" />
-        </listeners>
-      </source>
-    </sources>
-    <sharedListeners>
-      <add name="xml" type="System.Diagnostics.XmlWriterTraceListener" initializeData="C:\log\MatterSphere.Services.svclog" />
-    </sharedListeners>
-  </system.diagnostics>
-  <!--
-    For a description of web.config changes for .NET 4.5 see http://go.microsoft.com/fwlink/?LinkId=235367.
 
-    The following attributes can be set on the <httpRuntime> tag.
-      <system.Web>
-        <httpRuntime targetFramework="4.5" />
-      </system.Web>
-  -->
+<appSettings>
+    <add key="DocumentStorageUser" value="imcadmin" />
+    <add key="DocumentStoragePassword" value="P4ssw0rd" />
+    <add key="DocumentStorageAPI" value="https://test-auto9.test.fwbs.net/api/v1" />
+    <add key="ExternalDocumentStorageUsed" value="True" />
+    <add key="DocumentStorage" value="IManage" />
+    <add key="FolderName" value="Client Documents" />
+    <add key="DatabaseName" value="WS9" />
+    <add key="NotificationServer" value="https://test-exc13/ews/Exchange.asmx" />
+    <add key="ExchangeVersion" value="Exchange2013" />
+    <add key="SmtpPort" value="587" />
+    <add key="EmailNotifier" value="TestAdmin@test.fwbs.net" />
+    <add key="EmailNotifierPassword" value="P4ssword" />
+  </appSettings>
+
+  <location path="DocumentViewer/Upload">
+    <system.web>
+      <httpRuntime maxRequestLength="4000960" />
+    </system.web>
+    <system.webServer>
+      <security>
+        <requestFiltering>
+          <requestLimits maxAllowedContentLength="4000960000"></requestLimits>
+        </requestFiltering>
+      </security>
+    </system.webServer>
+  </location>
   <system.web>
-    <compilation debug="true" targetFramework="4.5" />
-    <authentication mode="Windows" />
-    <pages controlRenderingCompatibilityVersion="4.0" />
+    <globalization enableClientBasedCulture="true" uiCulture="auto" culture="auto" />
+    <identity impersonate="false" />
+    <authentication mode="Forms">
+      <forms loginUrl="login/index" defaultUrl="home/index" timeout="15" slidingExpiration="false" />
+    </authentication>
+    <httpRuntime targetFramework="4.5" relaxedUrlToFileSystemMapping="true" enableVersionHeader="false" />
+    <compilation targetFramework="4.5">
+      <assemblies>
+        <add assembly="Microsoft.Build.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A" />
+      </assemblies>
+    </compilation>
+    <pages>
+      <namespaces>
+        <add namespace="System.Web.Helpers" />
+        <add namespace="System.Web.Mvc" />
+        <add namespace="System.Web.Mvc.Ajax" />
+        <add namespace="System.Web.Mvc.Html" />
+        <add namespace="System.Web.Routing" />
+        <add namespace="System.Web.WebPages" />
+      </namespaces>
+    </pages>
+    <customErrors mode="Off" />
+    <!-- Glimpse: This can be commented in to add additional data to the Trace tab when using WebForms
+        <trace writeToDiagnosticsTrace="true" enabled="true" pageOutput="false"/> -->
+    <httpModules>
+      <add name="Glimpse" type="Glimpse.AspNet.HttpModule, Glimpse.AspNet" />
+    </httpModules>
+    <httpHandlers>
+      <add path="glimpse.axd" verb="GET" type="Glimpse.AspNet.HttpHandler, Glimpse.AspNet" />
+      <add path="document-viewer/LoadFileBrowserTreeData" verb="*" type="System.Web.HttpNotFoundHandler" />
+    </httpHandlers>
   </system.web>
+  <system.webServer>
+    <handlers>
+      <remove name="ExtensionlessUrlHandler-ISAPI-4.0_32bit" />
+      <remove name="ExtensionlessUrlHandler-ISAPI-4.0_64bit" />
+      <remove name="ExtensionlessUrlHandler-Integrated-4.0" />
+      <add name="ExtensionlessUrlHandler-ISAPI-4.0_32bit" path="*." verb="GET,HEAD,POST,DEBUG,PUT,DELETE,PATCH,OPTIONS" modules="IsapiModule" scriptProcessor="%windir%\Microsoft.NET\Framework\v4.0.30319\aspnet_isapi.dll" preCondition="classicMode,runtimeVersionv4.0,bitness32" responseBufferLimit="0" />
+      <add name="ExtensionlessUrlHandler-ISAPI-4.0_64bit" path="*." verb="GET,HEAD,POST,DEBUG,PUT,DELETE,PATCH,OPTIONS" modules="IsapiModule" scriptProcessor="%windir%\Microsoft.NET\Framework64\v4.0.30319\aspnet_isapi.dll" preCondition="classicMode,runtimeVersionv4.0,bitness64" responseBufferLimit="0" />
+      <add name="ExtensionlessUrlHandler-Integrated-4.0" path="*." verb="GET,HEAD,POST,DEBUG,PUT,DELETE,PATCH,OPTIONS" type="System.Web.Handlers.TransferRequestHandler" preCondition="integratedMode,runtimeVersionv4.0" />
+      <add name="ViewDocumentHandler" verb="GET,POST" path="document-viewer/ViewDocumentHandler" type="Groupdocs.Web.UI.Handlers.ViewDocumentHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="GetDocumentPageImageHandler" verb="GET,POST" path="document-viewer/GetDocumentPageImageHandler" type="Groupdocs.Web.UI.Handlers.GetDocumentPageImageHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="GetImageUrlsHandler" verb="GET,POST" path="document-viewer/GetImageUrlsHandler" type="Groupdocs.Web.UI.Handlers.GetImageUrlsHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="GetCssHandler" verb="GET" path="document-viewer/CSS/GetCssHandler" type="Groupdocs.Web.UI.Handlers.CssHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="images" verb="GET" path="document-viewer/images/*" type="Groupdocs.Web.UI.Handlers.EmbeddedImageHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="GetScriptHandler" verb="GET,POST" path="document-viewer/GetScriptHandler" type="Groupdocs.Web.UI.Handlers.ScriptHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="GetFileHandler" verb="GET" path="document-viewer/GetFileHandler" type="Groupdocs.Web.UI.Handlers.GetFileHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="GetPdf2JavaScriptHandler" verb="GET,POST" path="document-viewer/GetPdf2JavaScriptHandler" type="Groupdocs.Web.UI.Handlers.GetPdf2JavaScriptHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="GetPdfWithPrintDialogHandler" verb="POST" path="document-viewer/GetPdfWithPrintDialogHandler" type="Groupdocs.Web.UI.Handlers.GetPdfWithPrintDialogHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="GetPrintableHtmlHandler" verb="GET,POST" path="document-viewer/GetPrintableHtmlHandler" type="Groupdocs.Web.UI.Handlers.GetPrintableHtmlHandler, Groupdocs.Viewer, Culture=neutral" />
+      <add name="Glimpse" path="glimpse.axd" verb="GET" type="Glimpse.AspNet.HttpHandler, Glimpse.AspNet" preCondition="integratedMode" />
+    </handlers>
+    <staticContent>
+      <clientCache cacheControlMode="DisableCache" />
+      <!--<mimeMap fileExtension=".less" mimeType="text/css" />-->
+      <mimeMap fileExtension=".Wizard" mimeType="application/xml" />
+    </staticContent>
+    <httpProtocol>
+      <customHeaders>
+        <add name="X-UA-Compatible" value="IE=edge" />
+        <add name="X-Content-Type-Options" value="nosniff" />
+      </customHeaders>
+    </httpProtocol>
+    <validation validateIntegratedModeConfiguration="false" />
+    <modules>
+      <add name="Glimpse" type="Glimpse.AspNet.HttpModule, Glimpse.AspNet" preCondition="integratedMode" />
+    </modules>
+  </system.webServer>
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly>
+        <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="Microsoft.Practices.Unity" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="Microsoft.Practices.Unity.Configuration" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
+      </dependentAssembly>
+    </assemblyBinding>
+  </runtime>
   <system.serviceModel>
-    <diagnostics>
-      <messageLogging logEntireMessage="true" logMalformedMessages="false" logMessagesAtServiceLevel="true" logMessagesAtTransportLevel="true" maxMessagesToLog="3000000" maxSizeOfMessageToLog="2000000" />
-    </diagnostics>
-    <services>
-      <service behaviorConfiguration="Generic" name="Elite.Framework.Entities.GenericEntityService">
-        <endpoint address="" binding="basicHttpBinding" contract="Elite.Framework.Entities.IGenericEntityService" />
-      </service>
-      <service behaviorConfiguration="Generic" name="MatterSphere.DocumentManagement.DocumentDownloadRestfulService">
-        <endpoint address="" binding="webHttpBinding" contract="MatterSphere.DocumentManagement.IDocumentDownloadRestfulService" />
-      </service>
-      <service behaviorConfiguration="Generic" name="MatterSphere.DocumentManagement.DocumentUploadRestfulService">
-        <endpoint address="" binding="webHttpBinding" contract="MatterSphere.DocumentManagement.IDocumentUploadRestfulService" />
-      </service>
-    </services>
-    <extensions>
-      <behaviorExtensions>
-        <add name="GenericEntitySerializer" type="Elite.Framework.Entities.Extensions.EntityServiceBehaviorElement, Elite.Framework.Services" />
-        <add name="MSEntitySerializer" type="MatterSphere.Extensions.EntityServiceBehaviorElement, Elite.MatterSphere.Services" />
-      </behaviorExtensions>
-    </extensions>
-    <behaviors>
-      <serviceBehaviors>
-        <behavior>
-          <!-- To avoid disclosing metadata information, set the value below to false and remove the metadata endpoint above before deployment -->
-          <serviceMetadata httpGetEnabled="true" />
-          <!-- To receive exception details in faults for debugging purposes, set the value below to true.  Set to false before deployment to avoid disclosing exception information -->
-          <serviceDebug includeExceptionDetailInFaults="false" />
-          <serviceAuthorization principalPermissionMode="Custom">
-            <authorizationPolicies>
-              <add policyType="MatterSphere.Security.MSAuthorizationPolicy, Elite.MatterSphere.Services" />
-            </authorizationPolicies>
-          </serviceAuthorization>
-        </behavior>
-        <behavior name="Generic">
-          <!-- To avoid disclosing metadata information, set the value below to false and remove the metadata endpoint above before deployment -->
-          <!-- To receive exception details in faults for debugging purposes, set the value below to true.  Set to false before deployment to avoid disclosing exception information -->
-          <serviceDebug includeExceptionDetailInFaults="false" />
-          <serviceAuthorization principalPermissionMode="Custom">
-            <authorizationPolicies>
-              <add policyType="MatterSphere.Security.MSAuthorizationPolicy, Elite.MatterSphere.Services" />
-            </authorizationPolicies>
-          </serviceAuthorization>
-          <GenericEntitySerializer />
-        </behavior>
-      </serviceBehaviors>
-    </behaviors>
-    <serviceHostingEnvironment multipleSiteBindingsEnabled="true" />
     <bindings>
       <basicHttpBinding>
-        <binding maxBufferPoolSize="2147483647" maxReceivedMessageSize="2147483647" maxBufferSize="2147483647" transferMode="Buffered">
-          <readerQuotas maxArrayLength="2147483647" maxBytesPerRead="2147483647" maxDepth="2147483647" maxNameTableCharCount="2147483647" maxStringContentLength="2147483647" />
+        <binding name="BasicHttpBinding_IGenericEntityService" maxBufferPoolSize="2147483647" maxBufferSize="2147483647" maxReceivedMessageSize="2147483647">
           <security mode="Transport">
             <transport clientCredentialType="Windows" />
+          </security>
+        </binding>
+        <binding name="ReportExecutionServiceSoap" maxBufferPoolSize="2147483647" maxBufferSize="2147483647" maxReceivedMessageSize="2147483647">
+          <security mode="TransportCredentialOnly">
+            <transport clientCredentialType="Ntlm" />
+          </security>
+        </binding>
+        <binding name="ReportingService2005Soap">
+          <security mode="TransportCredentialOnly">
+            <transport clientCredentialType="Ntlm" />
           </security>
         </binding>
       </basicHttpBinding>
-      <webHttpBinding>
-        <binding maxBufferPoolSize="2147483647" maxReceivedMessageSize="2147483647" maxBufferSize="2147483647" transferMode="Streamed">
-          <readerQuotas maxArrayLength="2147483647" maxBytesPerRead="2147483647" maxDepth="2147483647" maxNameTableCharCount="2147483647" maxStringContentLength="2147483647" />
-          <security mode="Transport">
-            <transport clientCredentialType="Windows" />
-          </security>
-        </binding>
-      </webHttpBinding>
     </bindings>
+    <client>
+      <endpoint address="https://qawin10365.test.fwbs.net/MSAPI_18_3/GenericAPI.svc" binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_IGenericEntityService" contract="MatterSphere.Services.IGenericEntityService" name="BasicHttpBinding_IGenericEntityService" />
+      <endpoint address="/ReportExecution2005.asmx" binding="basicHttpBinding" bindingConfiguration="ReportExecutionServiceSoap" contract="ReportExecution.ReportExecutionServiceSoap" name="ReportExecutionServiceSoap" />
+      <endpoint address="http://localhost:80/ReportServer/ReportService2005.asmx" binding="basicHttpBinding" bindingConfiguration="ReportingService2005Soap" contract="ReportInformation.ReportingService2005Soap" name="ReportingService2005Soap" />
+    </client>
   </system.serviceModel>
-  <system.webServer>
-    <modules runAllManagedModulesForAllRequests="true" />
-  </system.webServer>
-  <applicationSettings>
-    <MatterSphere.Properties.Settings>
-      <setting name="UserName" serializeAs="String">
-        <value>elitesql</value>
-      </setting>
-      <setting name="Password" serializeAs="String">
-        <value>Elite123</value>
-      </setting>
-      <setting name="LoginType" serializeAs="String">
-        <value />
-      </setting>
-      <setting name="DatabaseServer" serializeAs="String">
-        <value>test-sql14</value>
-      </setting>
-      <setting name="DatabaseName" serializeAs="String">
-        <value>AHv86Standard</value>
-      </setting>
-      <setting name="Setting" serializeAs="String">
-        <value />
-      </setting>
-    </MatterSphere.Properties.Settings>
-  </applicationSettings>
-  <connectionStrings>
-    <add name="MatterSphere.Properties.Settings.DatabaseConnectionString" connectionString="Data Source=%SERVER%;Initial Catalog=%DATABASE%;User ID=%USERNAME%;Password=%PASSWORD%;Integrated Security=True;enlist=false" providerName="System.Data.SqlClient" />
-  </connectionStrings>
+  <documentService uploadServiceUri="https://qawin10365.test.fwbs.net/MSAPI_18_3/Documents/Upload.svc" downloadServiceUri="https://qawin10365.test.fwbs.net/MSAPI_18_3/Documents/Download.svc" />
+  <prizm imagingServiceUrl="http://localhost:18681/PCCIS/V1" />
+  <userTempStorage rootFolder="%ALLUSERSPROFILE%\Portal" useWindowsEFS="false">
+    <temporaryFiles path="Temp">
+      <caching maxSize="1000" expireAfter="240" expireIfNotAccessedAfter="60" />
+    </temporaryFiles>
+    <appData path="Data"></appData>
+  </userTempStorage>
+  <unity xmlns="http://schemas.microsoft.com/practices/2010/unity">
+    <container>
+      <register type="Portal.Interfaces.IPostalAddressProvider, Portal.Interfaces" mapTo="ClientPortal.DataService.PostcodeAnywhereAddressProvider, ClientPortal.DataService" />
+    </container>
+  </unity>
+  <portal enableDiagnostics="true" viewPackage="Demo">
+    <administrator name="Administrator Name" email="Admin@test.com" phone="01234 567890" />
+    <extensions>
+      <extension name="PostcodeChecker">
+        <data>
+          <add key="APIKey" value="ZC54-MN56-DX59-NT92" />
+        </data>
+      </extension>
+    </extensions>
+  </portal>
+  <portalServerCredentials>
+		<credentials domain="TEST" username="MSAPI" password="P4ssword" />
+	</portalServerCredentials>
+  
+  <portalPWResetTimeOut>
+    <!-- time is in minutes -->
+    <timeout time="60" />
+  </portalPWResetTimeOut>
+  <glimpse defaultRuntimePolicy="On" endpointBaseUri="~/Glimpse.axd">
+    <!-- If you are having issues with Glimpse, please include this. It will help us figure out whats going on. 
+      <logging level="Trace" />-->
+    <!-- Want to use Glimpse on a remote server? Ignore the LocalPolicy by removing this comment.
+      <runtimePolicies>
+        <ignoredTypes>
+          <add type="Glimpse.AspNet.Policy.LocalPolicy, Glimpse.AspNet"/>
+        </ignoredTypes>
+      </runtimePolicies>-->
+  </glimpse>
 </configuration>
