@@ -10,22 +10,21 @@
     <section name="portalPWResetTimeOut" type="Portal.Interfaces.Configuration.PortalPWResetTimeOutSection, Portal.Interfaces" />
     <section name="glimpse" type="Glimpse.Core.Configuration.Section, Glimpse.Core" />
   </configSections>
-
-<appSettings>
-    <add key="DocumentStorageUser" value="imcadmin" />
-    <add key="DocumentStoragePassword" value="P4ssw0rd" />
-    <add key="DocumentStorageAPI" value="https://test-auto9.test.fwbs.net/api/v1" />
-    <add key="ExternalDocumentStorageUsed" value="True" />
+  <appSettings>
+    <add key="DocumentStorageUser" value="" />
+    <add key="DocumentStoragePassword" value="" />
+    <add key="DocumentStorageAPI" value="" />
+    <add key="LoginEndpoint" value="session/network-login" />
+    <add key="ExternalDocumentStorageUsed" value="False" />
     <add key="DocumentStorage" value="IManage" />
-    <add key="FolderName" value="Client Documents" />
-    <add key="DatabaseName" value="WS9" />
-    <add key="NotificationServer" value="https://test-exc13/ews/Exchange.asmx" />
-    <add key="ExchangeVersion" value="Exchange2013" />
-    <add key="SmtpPort" value="587" />
-    <add key="EmailNotifier" value="TestAdmin@test.fwbs.net" />
-    <add key="EmailNotifierPassword" value="P4ssword" />
+    <add key="FolderName" value="Client Public Documents" />
+    <add key="DatabaseName" value="" />
+    <add key="NotificationServer" value="" />
+    <add key="SmtpPort" value="" />
+    <add key="EmailNotifier" value="" />
+    <add key="EmailNotifierPassword" value="" />
+    <add key="ExchangeVersion" value="" />
   </appSettings>
-
   <location path="DocumentViewer/Upload">
     <system.web>
       <httpRuntime maxRequestLength="4000960" />
@@ -42,10 +41,10 @@
     <globalization enableClientBasedCulture="true" uiCulture="auto" culture="auto" />
     <identity impersonate="false" />
     <authentication mode="Forms">
-      <forms loginUrl="login/index" defaultUrl="home/index" timeout="15" slidingExpiration="false" />
+      <forms loginUrl="login/index" defaultUrl="home/index" timeout="30" slidingExpiration="false" />
     </authentication>
     <httpRuntime targetFramework="4.5" relaxedUrlToFileSystemMapping="true" enableVersionHeader="false" />
-    <compilation targetFramework="4.5">
+    <compilation debug="true" targetFramework="4.5">
       <assemblies>
         <add assembly="Microsoft.Build.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A" />
       </assemblies>
@@ -144,12 +143,12 @@
       </basicHttpBinding>
     </bindings>
     <client>
-      <endpoint address="https://qawin10365.test.fwbs.net/MSAPI_18_3/GenericAPI.svc" binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_IGenericEntityService" contract="MatterSphere.Services.IGenericEntityService" name="BasicHttpBinding_IGenericEntityService" />
+      <endpoint address="https://MS-Test-VM8.TEST.FWBS.NET/MSAPI/GenericAPI.svc" binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_IGenericEntityService" contract="MatterSphere.Services.IGenericEntityService" name="BasicHttpBinding_IGenericEntityService" />
       <endpoint address="/ReportExecution2005.asmx" binding="basicHttpBinding" bindingConfiguration="ReportExecutionServiceSoap" contract="ReportExecution.ReportExecutionServiceSoap" name="ReportExecutionServiceSoap" />
       <endpoint address="http://localhost:80/ReportServer/ReportService2005.asmx" binding="basicHttpBinding" bindingConfiguration="ReportingService2005Soap" contract="ReportInformation.ReportingService2005Soap" name="ReportingService2005Soap" />
     </client>
   </system.serviceModel>
-  <documentService uploadServiceUri="https://qawin10365.test.fwbs.net/MSAPI_18_3/Documents/Upload.svc" downloadServiceUri="https://qawin10365.test.fwbs.net/MSAPI_18_3/Documents/Download.svc" />
+  <documentService uploadServiceUri="https://MS-Test-VM8.TEST.FWBS.NET/MSAPI/Documents/Upload.svc" downloadServiceUri="https://MS-Test-VM8.TEST.FWBS.NET/MSAPI/Documents/Download.svc" />
   <prizm imagingServiceUrl="http://localhost:18681/PCCIS/V1" />
   <userTempStorage rootFolder="%ALLUSERSPROFILE%\Portal" useWindowsEFS="false">
     <temporaryFiles path="Temp">
@@ -162,7 +161,7 @@
       <register type="Portal.Interfaces.IPostalAddressProvider, Portal.Interfaces" mapTo="ClientPortal.DataService.PostcodeAnywhereAddressProvider, ClientPortal.DataService" />
     </container>
   </unity>
-  <portal enableDiagnostics="true" viewPackage="Demo">
+  <portal enableDiagnostics="true" viewPackage="Basic">
     <administrator name="Administrator Name" email="Admin@test.com" phone="01234 567890" />
     <extensions>
       <extension name="PostcodeChecker">
@@ -172,10 +171,25 @@
       </extension>
     </extensions>
   </portal>
-  <portalServerCredentials>
-		<credentials domain="TEST" username="MSAPI" password="P4ssword" />
-	</portalServerCredentials>
-  
+  <portalServerCredentials configProtectionProvider="RsaProtectedConfigurationProvider">
+    <EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Element" xmlns="http://www.w3.org/2001/04/xmlenc#">
+      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <EncryptedKey xmlns="http://www.w3.org/2001/04/xmlenc#">
+          <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
+          <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+            <KeyName>Rsa Key</KeyName>
+          </KeyInfo>
+          <CipherData>
+            <CipherValue>XCL7ZAHkvfCQYGUOWaja9VQYBgHSfIb0s9V8vijQGR7d1sKWC7GHjuP5NeKgDg2pC5C8Wd5ZM6xoH92ibYDsZDuRbbiPICl0d/xu1uRtuGYBy7JsxF1gZaoj5ZTF1KmzXziDRjtQpqmrHKWK85k5nqRc88Oou+6/NT2VznwXC/Iz/KxqCenqPvc29/lDPQl0286M2/lsTSlTw48SG08bva05V/6+2Ktk5lx0ept9MiGsplOUy7vomLp2j3jWU+HKuOh7OBDTMOXMaD8lEsoYfG6YGR0R/HDV5kN+iaYjgDpC+0OXdVAy9broznJnmAA2DGIjQYTZ+3Pr0IJ4sAtHHQ==</CipherValue>
+          </CipherData>
+        </EncryptedKey>
+      </KeyInfo>
+      <CipherData>
+        <CipherValue>Qego6ysRZ7XptyXssvl5P55qwD114WIBBqNko0hJPmfLx9sVxGmUkcMtFXBGG5F0OOmAOR0z97oncY3SNh7zAIbxn0dyB68mMjIDZ2N9ndBUIUlD8Lfqo41uk1UyjwRfFEbTfz2Z2CzkeCLhjZPVai9AwwBvbx33trA58POaNqjydr9OGKn7CA==</CipherValue>
+      </CipherData>
+    </EncryptedData>
+  </portalServerCredentials>
   <portalPWResetTimeOut>
     <!-- time is in minutes -->
     <timeout time="60" />
