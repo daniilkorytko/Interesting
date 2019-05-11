@@ -124,7 +124,7 @@
         <value>test-sql14</value>
       </setting>
       <setting name="DatabaseName" serializeAs="String">
-        <value>V8Testing_Pen</value>
+        <value>AHv86Standard</value>
       </setting>
       <setting name="Setting" serializeAs="String">
         <value />
